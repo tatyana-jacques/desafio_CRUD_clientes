@@ -5,14 +5,12 @@ import com.tatyanajacques.desafio_CRUD_clientes.entities.Client;
 import com.tatyanajacques.desafio_CRUD_clientes.repositories.ClientRepository;
 import com.tatyanajacques.desafio_CRUD_clientes.services.exceptions.IdNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.constraints.PastOrPresent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
 
 @Service
 public class ClientService {
@@ -51,6 +49,14 @@ public class ClientService {
         } catch (EntityNotFoundException e) {
             throw new IdNotFoundException("Cliente não encontrado.");
         }
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public void delete(Long id){
+        if(!repository.existsById(id)){
+            throw new IdNotFoundException("Cliente não encontrado");
+        }
+        repository.deleteById(id);
     }
 
     private void copyDTOToEntity(ClientDTO dto, Client entity) {
